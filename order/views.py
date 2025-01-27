@@ -1,9 +1,7 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import ValidationError
-from .models import Cart, CartItem, Order
-from .serializers import CartSerializer, CartItemSerializer, OrderSerializer
-from product.models import Inventory
+from .models import Cart, CartItem, Order, OrderDetail
+from .serializers import CartSerializer, CartItemSerializer, OrderSerializer, OrderDetailSerializer
 
 
 class CartListCreateView(generics.ListCreateAPIView):
@@ -11,21 +9,35 @@ class CartListCreateView(generics.ListCreateAPIView):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
 
 
-class CartItemCreateView(generics.CreateAPIView):
+class CartDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+
+
+class CartItemListCreateView(generics.ListCreateAPIView):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        cart = Cart.objects.get(user=self.request.user)
-        inventory = serializer.validated_data['inventory']
-        if inventory.stock < serializer.validated_data['quantity']:
-            raise ValidationError("Not enough stock available")
-        serializer.save(cart=cart)
+    def get_queryset(self):
+        return CartItem.objects.filter(cart__user=self.request.user)
+
+
+class CartItemDetailView(generics.RetrieveUpdateAPIView):
+    queryset = CartItem.objects.all()
+    serializer_class = CartItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CartItem.objects.filter(cart__user=self.request.user)
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
@@ -33,15 +45,32 @@ class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        cart = Cart.objects.get(user=self.request.user)
-        total_amount = sum([item.inventory.price * item.quantity for item in cart.items.all()])
-        serializer.save(user=self.request.user, cart=cart, total_amount=total_amount)
-        cart.items.all().delete()  
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
 
-class OrderRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+class OrderDetailView(generics.RetrieveUpdateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = "uid"
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+
+
+class OrderDetailListCreateView(generics.ListCreateAPIView):
+    queryset = OrderDetail.objects.all()
+    serializer_class = OrderDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return OrderDetail.objects.filter(order__user=self.request.user)
+
+
+class OrderDetailRetrieveView(generics.RetrieveUpdateAPIView):
+    queryset = OrderDetail.objects.all()
+    serializer_class = OrderDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return OrderDetail.objects.filter(order__user=self.request.user)

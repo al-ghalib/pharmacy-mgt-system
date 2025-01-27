@@ -1,18 +1,16 @@
 from django.urls import path
-from .views import (
-    CartListCreateView,
-    CartItemCreateView,
-    OrderListCreateView,
-    OrderRetrieveUpdateDestroyView,
-)
+from . import views
 
 urlpatterns = [
-    path("carts/", CartListCreateView.as_view(), name="cart-list-create"),
-    path("cart-items/", CartItemCreateView.as_view(), name="cart-item-create"),
-    path("orders/", OrderListCreateView.as_view(), name="order-list-create"),
-    path(
-        "orders/<uid>/",
-        OrderRetrieveUpdateDestroyView.as_view(),
-        name="order-retrieve-update-destroy",
-    ),
+    path("cart/", views.CartListCreateView.as_view(), name="cart-list-create"),
+    path("cart/<uuid:pk>/", views.CartDetailView.as_view(), name="cart-detail"),
+   
+    path("cart-item/", views.CartItemListCreateView.as_view(), name="cart-item-list-create"),
+    path("cart-item/<uuid:pk>/", views.CartItemDetailView.as_view(), name="cart-item-detail"),
+   
+    path("order/", views.OrderListCreateView.as_view(), name="order-list-create"),
+    path("order/<uuid:pk>/", views.OrderDetailView.as_view(), name="order-detail"),
+   
+    path("order-detail/", views.OrderDetailListCreateView.as_view(), name="order-detail-list-create"),
+    path("order-detail/<uuid:pk>/", views.OrderDetailRetrieveView.as_view(), name="order-detail-retrieve"),
 ]

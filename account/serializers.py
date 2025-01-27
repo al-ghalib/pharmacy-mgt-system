@@ -1,20 +1,20 @@
 from rest_framework import serializers
-from .models import Organization, OrganizationUser, User
+from .models import User, Organization, OrganizationUser
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email", "role", "organization", "is_staff"]
+        fields = ['uid', 'email', 'first_name', 'last_name', 'phone', 'address', 'gender', 'image', 'status', 'organization']
 
 
 class OrganizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Organization
-        fields = ["id", "name", "created_at"]
+        fields = ['uid', 'name', 'phone', 'email', 'address', 'trade_licence', 'details', 'branch']
 
 
 class OrganizationUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrganizationUser
-        fields = ["id", "user", "organization", "is_admin"]
+        fields = ['uid', 'user', 'organization', 'role', 'status', 'salary']
