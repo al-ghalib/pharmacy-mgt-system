@@ -4,9 +4,10 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-bk@rl%_yw=z(7ie(3tnp_##krum@m9k^_8^k(5hxnd=ap2+$k$"
-# SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 ALLOWED_HOSTS = []
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -14,11 +15,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
+    
     "account",
     "product",
     "order",
+    'inventory_management',
     # 'sales',
 ]
 
@@ -92,8 +97,13 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DRF B2C Pharmacy API',
+}
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
