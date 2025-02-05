@@ -1,11 +1,10 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import transaction
-from product.models import Inventory
+# from product.models import Inventory
 from .models import *
 
 
-""" Clear the cart when the order is placed """
 @receiver(post_save, sender=Order)
 def clear_cart(sender, instance, created, **kwargs):
     if created and instance.status == "confirmed":
@@ -19,8 +18,6 @@ def clear_cart(sender, instance, created, **kwargs):
             print(f"Error while clearing cart: {e}")
 
 
-
-""" Reduce stock after an order is confirmed """
 @receiver(post_save, sender=OrderDetail)
 def reduce_stock(sender, instance, created, **kwargs):
     if created:

@@ -11,9 +11,7 @@ class StockMovement(BaseModel):
         ("return", "Return"),
     ]
 
-    inventory = models.ForeignKey(
-        Inventory, on_delete=models.CASCADE, related_name="stock_movements"
-    )
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="stock_movements")
     movement_type = models.CharField(max_length=20, choices=MOVEMENT_TYPES)
     quantity = models.PositiveIntegerField()
     previous_stock = models.PositiveIntegerField()
@@ -37,9 +35,7 @@ class StockMovement(BaseModel):
 
 
 class SalesRecord(BaseModel):
-    inventory = models.ForeignKey(
-        Inventory, on_delete=models.CASCADE, related_name="sales_records"
-    )
+    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="sales_records")
     quantity_sold = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     total_revenue = models.DecimalField(max_digits=12, decimal_places=2, editable=False)

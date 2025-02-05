@@ -1,7 +1,27 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.conf import settings
 from base.models import BaseModel
+from django.contrib.auth.models import BaseUserManager
+
+
+ROLE_CHOICES = [
+    ("admin", "Admin"),
+    ("sales", "Sales Associate"),
+    ("stock_updater", "Stock Updater"),
+    ("customer", "Customer"),
+]
+
+GENDER_CHOICES = [
+    ("male", "Male"),
+    ("female", "Female"),
+    ("other", "Other"),
+]
+
+STATUS_CHOICES = [
+    ("active", "Active"),
+    ("inactive", "Inactive"),
+    ("removed", "Removed"),
+]
 
 
 class UserManager(BaseUserManager):
@@ -9,6 +29,7 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
+        extra_fields.setdefault("is_active", True)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -17,36 +38,29 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
+        extra_fields.setdefault("role", "admin")
+
+        if extra_fields.get("role") != "admin":
+            raise ValueError("Superuser must have role of Admin")
+
         return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractUser, BaseModel):
     username = None
-    email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=100, blank=True, null=True)
-    last_name = models.CharField(max_length=100, blank=True, null=True)
+    email = models.EmailField(unique=True, error_messages={"unique": "A user with that email already exists."},)
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
-    
-    gender_choices = [("male", "Male"), ("female", "Female"), ("other", "Other")]
-    gender = models.CharField(max_length=10, choices=gender_choices, blank=True, null=True)
-    
-    image = models.ImageField(upload_to='user_images/', blank=True, null=True)
-    
-    status_choices = [("active", "Active"), ("inactive", "Inactive"), ("removed", "Removed")]
-    status = models.CharField(max_length=10, choices=status_choices, default="active")
 
-    organization = models.ForeignKey(
-        "Organization",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="users",
+    gender = models.CharField(
+        max_length=10, choices=GENDER_CHOICES, blank=True, null=True
     )
+
+    image = models.ImageField(upload_to="user_images/", blank=True, null=True)
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
+
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="customer")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -55,17 +69,29 @@ class User(AbstractUser, BaseModel):
 
     def __str__(self):
         return self.email
+    
+    @property
+    def is_admin(self):
+        return self.role == "admin"
+
+    @property
+    def is_active_status(self):
+        return self.status == "active"
+
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        return None
+
 
 
 class Organization(BaseModel):
     name = models.CharField(max_length=100, unique=True)
-    phone = models.CharField(max_length=15, blank=False, null=True)  
-    email = models.EmailField(blank=False, null=True)  
-    address = models.TextField(blank=False, null=True)  
-    trade_licence = models.CharField(max_length=100, blank=False, null=True)  
-   
-    details = models.TextField(blank=True, null=True)  
-    branch = models.CharField(max_length=100, blank=True, null=True)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    email = models.EmailField(unique=True)
+    address = models.TextField(blank=True, null=True)
+    trade_licence = models.CharField(max_length=100, blank=True, null=True)
+    details = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -73,7 +99,7 @@ class Organization(BaseModel):
 
 class OrganizationUser(BaseModel):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  
+        User,
         on_delete=models.CASCADE,
         related_name="organization_memberships",
     )
@@ -82,21 +108,17 @@ class OrganizationUser(BaseModel):
         on_delete=models.CASCADE,
         related_name="organization_users",
     )
-    ROLE_CHOICES = [
-        ("admin", "Admin"),
-        ("sales", "Sales Associate"),
-        ("stock_updater", "Stock Updater"),
-    ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="sales")
-    status_choices = [("active", "Active"), ("inactive", "Inactive"), ("removed", "Removed")]
-    status = models.CharField(max_length=10, choices=status_choices, default="active")
+
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
     salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.email} - {self.organization.name}"
-
-
-
+    
+    @property
+    def is_active_member(self):
+        return self.status == "active"
 
 
 # from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -131,7 +153,7 @@ class OrganizationUser(BaseModel):
 #     username = None
 #     email = models.EmailField(unique=True)
 #     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
-    
+
 #     organization = models.ForeignKey(
 #         "Organization",
 #         on_delete=models.SET_NULL,
@@ -215,5 +237,3 @@ class OrganizationUser(BaseModel):
 
 #     def __str__(self):
 #         return f"{self.user.email} - {self.organization.name}"
-
-
