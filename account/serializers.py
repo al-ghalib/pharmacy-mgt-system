@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ["uid", "created_at", "updated_at"] 
 
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
@@ -30,6 +31,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+
 
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():

@@ -1,5 +1,5 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from account.permissions import IsAdmin, IsSalesAssociate
 from .models import Medicine, Category, Inventory
 from .serializers import (
     MedicineSerializer,
@@ -7,26 +7,26 @@ from .serializers import (
     InventorySerializer,
 )
 
-
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmin]
 
 
 class MedicineListCreateView(generics.ListCreateAPIView):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdmin]
 
 
 class InventoryListCreateView(generics.ListCreateAPIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsSalesAssociate]
 
 
 class InventoryRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Inventory.objects.all()
     serializer_class = InventorySerializer
+    permission_classes = [IsSalesAssociate]
     lookup_field = "uid"

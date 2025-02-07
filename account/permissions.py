@@ -2,38 +2,26 @@ from rest_framework.permissions import BasePermission
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.role == "admin"
+        return request.user.is_authenticated and getattr(request.user, "role", None) == "admin" 
 
 class IsSalesAssociate(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.role == "sales"
+        return request.user.is_authenticated and getattr(request.user, "role", None) in ["sales", "admin"] 
 
 class IsStockUpdater(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.role == "stock_updater"
+        return request.user.is_authenticated and getattr(request.user, "role", None) in ["stock_updater", "admin"]
 
 class IsCustomer(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.role == "customer"
+        return request.user.is_authenticated and getattr(request.user, "role", None) in ["customer", "admin"]
 
 class IsActiveUser(BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.status == "active"
+        return request.user.is_authenticated and getattr(request.user, "status", None) == "active"
 
 
 
-# from rest_framework import permissions
 
-# class IsAdmin(permissions.BasePermission):
-#     def has_permission(self, request, view):
-#         return request.user.is_authenticated and request.user.role == "admin"
-
-# class IsSales(permissions.BasePermission):
-#     def has_permission(self, request, view):
-#         return request.user.is_authenticated and request.user.role in ["admin", "sales"]
-
-# class IsStockUpdater(permissions.BasePermission):
-#     def has_permission(self, request, view):
-#         return request.user.is_authenticated and request.user.role in ["admin", "stock_updater"]
 
 

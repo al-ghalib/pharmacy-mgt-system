@@ -4,24 +4,23 @@ from base.models import BaseModel
 from django.contrib.auth.models import BaseUserManager
 
 
-ROLE_CHOICES = [
-    ("admin", "Admin"),
-    ("sales", "Sales Associate"),
-    ("stock_updater", "Stock Updater"),
-    ("customer", "Customer"),
-]
+class RoleChoices(models.TextChoices):
+    ADMIN = "admin", "Admin"
+    SALES = "sales", "Sales Associate"
+    STOCK_UPDATER = "stock_updater", "Stock Updater"
+    CUSTOMER = "customer", "Customer"
 
-GENDER_CHOICES = [
-    ("male", "Male"),
-    ("female", "Female"),
-    ("other", "Other"),
-]
 
-STATUS_CHOICES = [
-    ("active", "Active"),
-    ("inactive", "Inactive"),
-    ("removed", "Removed"),
-]
+class GenderChoices(models.TextChoices):
+    MALE = "male", "Male"
+    FEMALE = "female", "Female"
+    OTHER = "other", "Other"
+
+
+class StatusChoices(models.TextChoices):
+    ACTIVE = "active", "Active"
+    INACTIVE = "inactive", "Inactive"
+    REMOVED = "removed", "Removed"
 
 
 class UserManager(BaseUserManager):
@@ -48,19 +47,24 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser, BaseModel):
     username = None
-    email = models.EmailField(unique=True, error_messages={"unique": "A user with that email already exists."},)
+    email = models.EmailField(
+        unique=True,
+        error_messages={"unique": "A user with that email already exists."},
+    )
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
 
     gender = models.CharField(
-        max_length=10, choices=GENDER_CHOICES, blank=True, null=True
+        max_length=10, choices=GenderChoices.choices, blank=True, null=True
     )
-
     image = models.ImageField(upload_to="user_images/", blank=True, null=True)
 
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
-
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="customer")
+    status = models.CharField(
+        max_length=10, choices=StatusChoices.choices, default=StatusChoices.ACTIVE
+    )
+    role = models.CharField(
+        max_length=20, choices=RoleChoices.choices, default=RoleChoices.CUSTOMER
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -69,12 +73,10 @@ class User(AbstractUser, BaseModel):
 
     def __str__(self):
         return self.email
-    
-    @property
+
     def is_admin(self):
         return self.role == "admin"
 
-    @property
     def is_active_status(self):
         return self.status == "active"
 
@@ -84,7 +86,6 @@ class User(AbstractUser, BaseModel):
         return None
 
 
-
 class Organization(BaseModel):
     name = models.CharField(max_length=100, unique=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
@@ -92,6 +93,7 @@ class Organization(BaseModel):
     address = models.TextField(blank=True, null=True)
     trade_licence = models.CharField(max_length=100, blank=True, null=True)
     details = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=StatusChoices.choices, default=StatusChoices.ACTIVE)
 
     def __str__(self):
         return self.name
@@ -109,14 +111,19 @@ class OrganizationUser(BaseModel):
         related_name="organization_users",
     )
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
+    role = models.CharField(
+        max_length=20, choices=RoleChoices.choices, default=RoleChoices.CUSTOMER
+    ) 
+
+    status = models.CharField(
+        max_length=10, choices=StatusChoices.choices, default=StatusChoices.ACTIVE
+    )
+
     salary = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.email} - {self.organization.name}"
-    
-    @property
+
     def is_active_member(self):
         return self.status == "active"
 
