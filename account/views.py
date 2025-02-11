@@ -10,12 +10,15 @@ from .permissions import IsAdmin
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
+
 # from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+
+#### Home Page ###
 
 class Home(generics.GenericAPIView):
     authentication_classes = [JWTAuthentication]
@@ -24,7 +27,9 @@ class Home(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         content = {"message": "Hello, user! Welcome to Pharmacy Management System."}
         return Response(content)
+    
 
+#### Login SignUp ###
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -34,16 +39,17 @@ class RegisterView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            refresh = RefreshToken.for_user(user)
+            # user = serializer.save()
+            # refresh = RefreshToken.for_user(user)
             return Response(
                 {
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh),
-                    "user": {
-                        "uid": user.uid,
-                        "email": user.email,
-                    },
+                    # "access": str(refresh.access_token),
+                    # "refresh": str(refresh),
+                    # "user": {
+                    #     "uid": user.uid,
+                    #     "email": user.email,
+                    # },
+                    {"message": "User registered successfully."},
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -71,7 +77,11 @@ class LoginView(generics.GenericAPIView):
                 {
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
-                    "uuid": user.uid,
+                    # "uuid": user.uid,
+                    "user": {
+                        "uid": user.uid,
+                        "email": user.email,
+                    },
                 },
                 status=status.HTTP_200_OK,
             )
@@ -79,6 +89,8 @@ class LoginView(generics.GenericAPIView):
             {"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
         )
 
+
+#### User ###
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -91,6 +103,10 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAdmin]
     lookup_field = "uid"
+
+    def perform_destroy(self, instance):
+        instance.status = StatusChoices.REMOVED
+        instance.save()
 
 
 class UserUpdateView(generics.UpdateAPIView):
@@ -141,12 +157,14 @@ class UserDeleteView(generics.DestroyAPIView):
         instance = self.get_object()
         instance.status = StatusChoices.REMOVED
         instance.save()
-        # instance.delete()
+
         return Response(
-            {"message": "User status updated to removed successfully."},
+            {"message": "User has been successfully marked as removed."},
             status=status.HTTP_200_OK,
         )
+    
 
+#### Organization ###
 
 class OrganizationListCreateView(generics.ListCreateAPIView):
     queryset = Organization.objects.all()
@@ -160,10 +178,9 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAdmin]
     lookup_field = "uid"
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        print(f"Updating organization: {instance.name}")
-        return super().update(request, *args, **kwargs)
+    def perform_destroy(self, instance):
+        instance.status = StatusChoices.REMOVED
+        instance.save()
 
 
 class OrganizationUpdateView(generics.UpdateAPIView):
@@ -194,22 +211,17 @@ class OrganizationDeleteView(generics.DestroyAPIView):
     permission_classes = [IsAdmin]
     lookup_field = "uid"
 
-    def perform_destroy(self, instance):
-        print(f"Deleting Organization: {instance.name}")
-        instance.status = "removed"
-        instance.save()
-        # instance.delete()
-
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        self.perform_destroy(instance)
+        instance.status = StatusChoices.REMOVED  
+        instance.save()
         return Response(
-            {
-                "message": f"Organization '{instance.name}' has been soft-deleted successfully."
-            },
+            {"message": f"Organization '{instance.name}' has been marked as removed."},
             status=status.HTTP_200_OK,
         )
 
+
+#### Organization User ###
 
 class OrganizationUserListCreateView(generics.ListCreateAPIView):
     queryset = OrganizationUser.objects.all()
@@ -222,3 +234,12 @@ class OrganizationUserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrganizationUserSerializer
     permission_classes = [IsAdmin]
     lookup_field = "uid"
+
+    def perform_destroy(self, instance):
+        instance.status = StatusChoices.REMOVED 
+        instance.save()
+        return Response(
+            {"message": "Organization User has been marked as removed."},
+            status=status.HTTP_200_OK,
+        )
+

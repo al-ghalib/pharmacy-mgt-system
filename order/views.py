@@ -52,8 +52,8 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsCustomer]
     lookup_field = "uid"
 
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+    # def get_queryset(self):
+    #     return Order.objects.filter(user=self.request.user)
 
 
 class OrderDetailItemListCreateView(generics.ListCreateAPIView):
@@ -61,5 +61,5 @@ class OrderDetailItemListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderDetailSerializer
     permission_classes = [IsCustomer]
 
-    def get_queryset(self):
-        return OrderDetail.objects.filter(order__user=self.request.user)
+    # def get_queryset(self):
+    #     return OrderDetail.objects.filter(order__user=self.request.user)

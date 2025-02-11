@@ -4,6 +4,20 @@ from account.models import User
 from product.models import Inventory
 
 
+class OrderStatusChoices(models.TextChoices):
+    PENDING = "pending", "Pending"
+    CONFIRMED = "confirmed", "Confirmed"
+    SHIPPED = "shipped", "Shipped"
+    DELIVERED = "delivered", "Delivered"
+    CANCELLED = "cancelled", "Cancelled"
+
+
+class PaymentMethodChoices(models.TextChoices):
+    CASH = "cash", "Cash"
+    CARD = "card", "Card"
+    ONLINE = "online", "Online Payment"
+
+
 class Cart(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carts")
     is_active = models.BooleanField(default=True)
@@ -31,19 +45,6 @@ class CartItem(BaseModel):
         return f"{self.quantity} x {self.inventory.medicine.name} in {self.cart.user.email}'s cart"
 
 
-class OrderStatusChoices(models.TextChoices):
-    PENDING = "pending", "Pending"
-    CONFIRMED = "confirmed", "Confirmed"
-    SHIPPED = "shipped", "Shipped"
-    DELIVERED = "delivered", "Delivered"
-    CANCELLED = "cancelled", "Cancelled"
-
-
-class PaymentMethodChoices(models.TextChoices):
-    CASH = "cash", "Cash"
-    CARD = "card", "Card"
-    ONLINE = "online", "Online Payment"
-
 
 class Order(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
@@ -65,6 +66,7 @@ class Order(BaseModel):
 
     def __str__(self):
         return f"Order {self.uid} by {self.user.email}"
+
 
 
 class OrderDetail(BaseModel):
