@@ -13,20 +13,13 @@
 					"name": "Register",
 					"request": {
 						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{Token}}",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": "{\n    \"email\": \"dipto@gmail.com\",\n    \"password\": \"diptorepliq\",\n    \"first_name\": \"Mr\",\n    \"last_name\": \"Dipto\",\n    \"gender\": \"male\",\n    \"phone\": \"01700022244\",\n    \"address\": \"Rajshahi\",\n    \"role\": \"customer\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -69,7 +62,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/login/",
+							"raw": "http://127.0.0.1:8000/api/login",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -80,8 +73,7 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"login",
-								""
+								"login"
 							]
 						}
 					},
@@ -160,7 +152,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"ghalib@gmail.com\",\n    \"password\": \"ghalibrepliq\"\n}",
+							"raw": "{\n    \"email\": \"dipto@gmail.com\",\n    \"password\": \"diptorepliq\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -168,7 +160,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/login/",
+							"raw": "http://127.0.0.1:8000/api/login",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -179,8 +171,7 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"login",
-								""
+								"login"
 							]
 						}
 					},
@@ -234,7 +225,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": " {\n        \"email\": \"orko@gmail.com\",\n        \"first_name\": \"Orko\",\n        \"last_name\": \"Ullah\",\n        \"gender\": \"male\",\n        \"phone\": \"01711123333\",\n        \"address\": \"\",\n        \"role\": \"customer\",\n        \"status\": \"removed\"\n    }",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -638,6 +629,9 @@
 			"item": [
 				{
 					"name": "categories",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -651,6 +645,15 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"\",\n        \"description\": \"\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/categories",
 							"protocol": "http",
@@ -670,16 +673,26 @@
 					"response": []
 				},
 				{
-					"name": "medicines/",
+					"name": "medicines",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Fexo20\",\n    \"generic_name\": \"Fexacinaticine\",\n    \"manufacturer\": \"Square\"\n}",
+							"raw": "{\n    \"name\": \"\",\n    \"generic_name\": \"\",\n    \"description\": \"\",\n    \"manufacturer\": \"\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -687,7 +700,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/medicines/",
+							"raw": "http://127.0.0.1:8000/api/medicines",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -698,15 +711,59 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"medicines",
-								""
+								"medicines"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "inventory/",
+					"name": "inventory",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicine\": \"\",\n    \"category\": \"\",\n    \"stock\": ,\n    \"price\": \"\",\n    \"image\": \"\",\n    \"expiry_date\": \"2026-10-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/inventory",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"inventory"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inventory/uid",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -721,7 +778,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/inventory/",
+							"raw": "http://127.0.0.1:8000/api/inventory/1290ce84-85f5-4b4d-b872-6a5e4b386469",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -733,31 +790,7 @@
 							"path": [
 								"api",
 								"inventory",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "inventory/uid/",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/inventory/4da65229-a581-44b2-89ca-0db4efeababc",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"inventory",
-								"4da65229-a581-44b2-89ca-0db4efeababc"
+								"1290ce84-85f5-4b4d-b872-6a5e4b386469"
 							]
 						}
 					},
@@ -795,11 +828,8 @@
 			"item": [
 				{
 					"name": "cart",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [
 							{
 								"key": "",
@@ -810,7 +840,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\" : 3\n}",
+							"raw": "{ \n    \"user\" : 9\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -818,7 +848,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/cart/",
+							"raw": "http://127.0.0.1:8000/api/cart",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -829,15 +859,14 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"cart",
-								""
+								"cart"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "cart/uid/",
+					"name": "cart/uid",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -852,7 +881,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/cart/8893be20-3412-4479-bc3d-47893fba5366/",
+							"raw": "http://127.0.0.1:8000/api/cart/59c613ec-ff2e-47a7-b685-7a06b3094502",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -864,61 +893,14 @@
 							"path": [
 								"api",
 								"cart",
-								"8893be20-3412-4479-bc3d-47893fba5366",
-								""
+								"59c613ec-ff2e-47a7-b685-7a06b3094502"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "cart-item/",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{Token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"cart\": 2,\n    \"inventory\": 2\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/cart-item/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"cart-item",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "order/",
+					"name": "cart-items",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -934,7 +916,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"user\": 3\n}",
+							"raw": "{\n    \"cart\": 6,\n    \"inventory\": 1,\n    \"quantity\": 10\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -942,7 +924,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/order/",
+							"raw": "http://127.0.0.1:8000/api/cart-items",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -953,15 +935,59 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"order",
-								""
+								"cart-items"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "order/uid/",
+					"name": "order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"confirmed\",\n    \"is_paid\": true,\n    \"payment_method\": \"cash\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/order",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "order-detail",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -975,8 +1001,17 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/order/d338d019-ec33-4349-8754-83d390f6a8b8/",
+							"raw": "http://127.0.0.1:8000/api/order/85ce8e91-54e3-4797-9931-3f7e3adc1bd5",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -988,20 +1023,29 @@
 							"path": [
 								"api",
 								"order",
-								"d338d019-ec33-4349-8754-83d390f6a8b8",
-								""
+								"85ce8e91-54e3-4797-9931-3f7e3adc1bd5"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "order-detail/",
+					"name": "order/uid",
 					"request": {
-						"method": "GET",
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/order-detail/",
+							"raw": "http://127.0.0.1:8000/api/order/238d8448-3e03-4d44-a71b-31525f0a63cf",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -1012,8 +1056,8 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"order-detail",
-								""
+								"order",
+								"238d8448-3e03-4d44-a71b-31525f0a63cf"
 							]
 						}
 					},
