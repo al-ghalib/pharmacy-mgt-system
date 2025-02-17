@@ -19,4 +19,4 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderDetail)
 class OrderDetailAdmin(admin.ModelAdmin):
-    list_display = ("order", "cart_item", "quantity", "price")
+    list_display = ("order", "inventory", "quantity", "price")

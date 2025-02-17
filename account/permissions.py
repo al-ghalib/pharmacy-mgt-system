@@ -1,27 +1,70 @@
-from rest_framework.permissions import BasePermission
+from rest_framework import permissions
+from .models import RoleChoices
 
-class IsAdmin(BasePermission):
+
+class IsSuperUser(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and getattr(request.user, "role", None) == "admin" 
+        return request.user.is_authenticated and request.user.is_superuser
 
-class IsSalesAssociate(BasePermission):
+
+class IsOrganizationAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and getattr(request.user, "role", None) in ["sales", "admin"] 
+        return request.user.is_authenticated and (
+            request.user.is_superuser
+            or request.user.organization_memberships.filter(
+                role=RoleChoices.ADMIN
+            ).exists()
+        )
 
-class IsStockUpdater(BasePermission):
+
+class IsSalesAssociate(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and getattr(request.user, "role", None) in ["stock_updater", "admin"]
+        return request.user.is_authenticated and (
+            request.user.is_superuser
+            or request.user.organization_memberships.filter(
+                role=RoleChoices.SALES
+            ).exists()
+        )
 
-class IsCustomer(BasePermission):
+
+class IsStockUpdater(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and getattr(request.user, "role", None) in ["customer", "admin"]
+        return request.user.is_authenticated and (
+            request.user.is_superuser
+            or request.user.organization_memberships.filter(
+                role=RoleChoices.STOCK_UPDATER
+            ).exists()
+        )
 
-class IsActiveUser(BasePermission):
+
+class IsCustomer(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and getattr(request.user, "status", None) == "active"
+        return request.user.is_authenticated and (
+            request.user.is_superuser
+            or request.user.organization_memberships.filter(
+                role=RoleChoices.CUSTOMER
+            ).exists()
+        )
 
 
+class IsOrganizationStaff(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_superuser
+            or request.user.organization_memberships.filter(
+                role__in=[
+                    RoleChoices.ADMIN,
+                    RoleChoices.SALES,
+                    RoleChoices.STOCK_UPDATER,
+                ]
+            ).exists()
+        )
 
 
+class IsActiveUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_superuser or request.user.status == "ACTIVE"
+        )
 
 

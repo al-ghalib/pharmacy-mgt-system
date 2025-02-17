@@ -25,7 +25,7 @@ class Inventory(BaseModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="details")
     stock = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to="inventory/", blank=True, null=True)
+    image = models.ImageField(upload_to="Product_image/", blank=True, null=True)
     expiry_date = models.DateField()
 
     class Meta:

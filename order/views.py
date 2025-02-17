@@ -45,7 +45,6 @@ class CartItemListCreateView(generics.ListCreateAPIView):
 
 
 
-### Jhamela etay ###
 class OrderListCreateView(generics.ListCreateAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsCustomer]
@@ -57,7 +56,8 @@ class OrderListCreateView(generics.ListCreateAPIView):
         order = serializer.save(user=self.request.user)
         order.calculate_total_price()
 
-
+        if order.is_paid and order.payment_method:
+            order.confirm_order()
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -66,68 +66,11 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsCustomer]
     lookup_field = "uid"
 
-    # def get_queryset(self):
-    #     return Order.objects.filter(user=self.request.user)
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
 
 
 class OrderDetailsListView(generics.ListAPIView):
+    queryset = OrderDetail.objects.all()
     serializer_class = OrderDetailsSerializer
     permission_classes = [IsSalesAssociate] 
-
-    def get_queryset(self):
-        return OrderDetail.objects.filter(order__user=self.request.user)
-
-
-
-
-
-# class OrderListCreateView(generics.ListCreateAPIView):
-#     serializer_class = OrderSerializer
-#     permission_classes = [IsCustomer]
-
-#     def get_queryset(self):
-#         return Order.objects.filter(user=self.request.user)
-
-#     def perform_create(self, serializer):
-#         order = serializer.save(user=self.request.user)
-        
-#         cart = Cart.objects.filter(user=self.request.user, is_active=True).first()
-#         if not cart or not cart.cart_items.exists():
-#             raise ValidationError("Cannot place an order with an empty or inactive cart.")
-        
-#         total_price = sum(
-#             cart_item.price_per_item * cart_item.quantity for cart_item in cart.cart_items.all()
-#         )
-
-#         order.total_price = total_price
-#         order.save()
-
-
-
-
-
-
-
-
-
-
-
-# class OrderListCreateView(generics.ListCreateAPIView):
-#     serializer_class = OrderSerializer
-#     permission_classes = [IsCustomer]
-
-#     def get_queryset(self):
-#         return Order.objects.filter(user=self.request.user)
-
-#     def perform_create(self, serializer):
-#         order = serializer.save(user=self.request.user)
-
-#         cart = Cart.objects.filter(user=self.request.user, is_active=True).first()
-#         if not cart or not cart.cart_items.exists():
-#             raise ValidationError("Cannot place an order with an empty or inactive cart.")
-
-#         total_price = sum(
-#             cart_item.price_per_item * cart_item.quantity for cart_item in cart.cart_items.all()
-#         )
-#         order.total_price = total_price
-#         order.save()

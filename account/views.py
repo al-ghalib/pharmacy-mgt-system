@@ -1,4 +1,4 @@
-from .models import User, Organization, OrganizationUser, StatusChoices
+from .models import CustomUser, Organization, OrganizationUser, StatusChoices
 from .serializers import (
     UserSerializer,
     OrganizationSerializer,
@@ -6,16 +6,16 @@ from .serializers import (
     LoginSerializer,
     RegisterSerializer,
 )
-from .permissions import IsAdmin
+from .permissions import IsOrganizationAdmin, IsSuperUser
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-# from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.exceptions import ValidationError
 
 
 #### Home Page ###
@@ -27,30 +27,22 @@ class Home(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         content = {"message": "Hello, user! Welcome to Pharmacy Management System."}
         return Response(content)
-    
+
+
 
 #### Login SignUp ###
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
-            # user = serializer.save()
-            # refresh = RefreshToken.for_user(user)
+            serializer.save()
             return Response(
-                {
-                    # "access": str(refresh.access_token),
-                    # "refresh": str(refresh),
-                    # "user": {
-                    #     "uid": user.uid,
-                    #     "email": user.email,
-                    # },
-                    {"message": "User registered successfully."},
-                },
+                {"message": "User registered successfully."},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -63,6 +55,7 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         email = request.data.get("email")
         password = request.data.get("password")
+
         user = authenticate(email=email, password=password)
 
         if user:
@@ -75,11 +68,10 @@ class LoginView(generics.GenericAPIView):
             refresh = RefreshToken.for_user(user)
             return Response(
                 {
+                    "message": "User logged in successfully.",
                     "refresh": str(refresh),
                     "access": str(refresh.access_token),
-                    # "uuid": user.uid,
                     "user": {
-                        "uid": user.uid,
                         "email": user.email,
                     },
                 },
@@ -92,16 +84,17 @@ class LoginView(generics.GenericAPIView):
 
 #### User ###
 
+
 class UserListCreateView(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser]
 
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser]
     lookup_field = "uid"
 
     def perform_destroy(self, instance):
@@ -111,11 +104,11 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class UserUpdateView(generics.UpdateAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser]
 
     def get_object(self):
         uid = self.kwargs.get("uid")
-        return get_object_or_404(User, uid=uid)
+        return get_object_or_404(CustomUser, uid=uid)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -125,7 +118,7 @@ class UserUpdateView(generics.UpdateAPIView):
             new_email = data["email"]
             if new_email != instance.email:
                 if (
-                    User.objects.filter(email=new_email)
+                    CustomUser.objects.filter(email=new_email)
                     .exclude(uid=instance.uid)
                     .exists()
                 ):
@@ -148,9 +141,9 @@ class UserUpdateView(generics.UpdateAPIView):
 
 
 class UserDeleteView(generics.DestroyAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser]
     lookup_field = "uid"
 
     def destroy(self, request, *args, **kwargs):
@@ -162,20 +155,21 @@ class UserDeleteView(generics.DestroyAPIView):
             {"message": "User has been successfully marked as removed."},
             status=status.HTTP_200_OK,
         )
-    
+
+
 
 #### Organization ###
 
 class OrganizationListCreateView(generics.ListCreateAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser]
 
 
 class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser | IsOrganizationAdmin]
     lookup_field = "uid"
 
     def perform_destroy(self, instance):
@@ -186,7 +180,7 @@ class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
 class OrganizationUpdateView(generics.UpdateAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser | IsOrganizationAdmin]
     lookup_field = "uid"
 
     def update(self, request, *args, **kwargs):
@@ -208,12 +202,12 @@ class OrganizationUpdateView(generics.UpdateAPIView):
 class OrganizationDeleteView(generics.DestroyAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSuperUser]
     lookup_field = "uid"
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.status = StatusChoices.REMOVED  
+        instance.status = StatusChoices.REMOVED
         instance.save()
         return Response(
             {"message": f"Organization '{instance.name}' has been marked as removed."},
@@ -221,25 +215,44 @@ class OrganizationDeleteView(generics.DestroyAPIView):
         )
 
 
+
 #### Organization User ###
 
 class OrganizationUserListCreateView(generics.ListCreateAPIView):
-    queryset = OrganizationUser.objects.all()
     serializer_class = OrganizationUserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsOrganizationAdmin]
+
+    def get_queryset(self):
+        return OrganizationUser.objects.exclude(status=StatusChoices.REMOVED)
+
+    def perform_create(self, serializer):
+        user = serializer.validated_data["user_id"]
+        organization = serializer.validated_data["organization_id"]
+
+        if OrganizationUser.objects.filter(
+            user=user, organization=organization
+        ).exists():
+            raise ValidationError("This user is already a member of the organization.")
+
+        serializer.save()
+        return Response(
+            {"message": "Organization User created successfully."},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class OrganizationUserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = OrganizationUser.objects.all()
     serializer_class = OrganizationUserSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsOrganizationAdmin]
     lookup_field = "uid"
 
+    def get_queryset(self):
+        return OrganizationUser.objects.exclude(status=StatusChoices.REMOVED)
+
     def perform_destroy(self, instance):
-        instance.status = StatusChoices.REMOVED 
+        instance.status = StatusChoices.REMOVED
         instance.save()
         return Response(
             {"message": "Organization User has been marked as removed."},
             status=status.HTTP_200_OK,
         )
-

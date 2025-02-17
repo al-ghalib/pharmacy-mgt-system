@@ -44,6 +44,4 @@ urlpatterns = [
         views.OrganizationUserDetailView.as_view(),
         name="organization-user-detail",
     ),
-    # path('organization-users/<uuid:uid>/update/', views.OrganizationUserUpdateView.as_view(), name='organization-user-update'),
-    # path('organization-users/<uuid:uid>/delete/', views.OrganizationUserDeleteView.as_view(), name='organization-user-delete'),
 ]

@@ -1,9 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Organization, OrganizationUser
+from .models import CustomUser, Organization, OrganizationUser
 
 
-@admin.register(User)
+@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     list_display = [
         "email",
@@ -11,11 +11,10 @@ class CustomUserAdmin(UserAdmin):
         "last_name",
         "phone",
         "status",
-        "role",
         "is_staff",
         "is_superuser",
     ]
-    list_filter = ["status", "role", "is_staff", "is_superuser"]
+    list_filter = ["status", "is_staff", "is_superuser"]
     search_fields = ["email", "first_name", "last_name"]
     ordering = ["email"]
     readonly_fields = ["last_login", "date_joined"]
@@ -37,10 +36,10 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
         (
-            "Status & Role",
+            "Status",
             {
-                "fields": ("status", "role"),
-                "description": "Manage the user's status and role in the system.",
+                "fields": ("status",),
+                "description": "Manage the user's status in the system.",
             },
         ),
         (
@@ -75,7 +74,6 @@ class CustomUserAdmin(UserAdmin):
                     "gender",
                     "image",
                     "status",
-                    "role",
                     "is_staff",
                     "is_superuser",
                 ),

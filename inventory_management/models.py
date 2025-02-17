@@ -2,14 +2,14 @@ from django.db import models
 from django.db.models import F, Sum
 from base.models import BaseModel
 from product.models import Inventory
-from account.models import User
+from account.models import CustomUser
 from django.core.exceptions import ValidationError
 
 
 class MovementTypeChoices(models.TextChoices):
-    PURCHASE = "purchase", "Purchase"
-    SALE = "sale", "Sale"
-    RETURN = "return", "Return"
+    PURCHASE = "PURCHASE", "Purchase"
+    SALE = "SALE", "Sale"
+    RETURN = "RETURN", "Return"
 
 
 class StockMovement(BaseModel):
@@ -22,7 +22,7 @@ class StockMovement(BaseModel):
     new_stock = models.PositiveIntegerField(editable=False)
     notes = models.TextField(blank=True, null=True)
     handled_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="stock_movements"
+        CustomUser, on_delete=models.SET_NULL, null=True, related_name="stock_movements"
     )
 
     def save(self, *args, **kwargs):
@@ -51,7 +51,7 @@ class SalesRecord(BaseModel):
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     total_revenue = models.DecimalField(max_digits=12, decimal_places=2, editable=False)
     sold_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True, related_name="sales"
+        CustomUser, on_delete=models.SET_NULL, null=True, related_name="sales"
     )
     date_sold = models.DateTimeField(auto_now_add=True)
 

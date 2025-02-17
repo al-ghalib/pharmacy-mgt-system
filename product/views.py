@@ -1,5 +1,5 @@
 from rest_framework import generics
-from account.permissions import IsAdmin, IsSalesAssociate
+from account.permissions import IsSalesAssociate
 from .models import Medicine, Category, Inventory
 from .serializers import (
     MedicineSerializer,
@@ -10,13 +10,13 @@ from .serializers import (
 class CategoryListCreateView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSalesAssociate]
 
 
 class MedicineListCreateView(generics.ListCreateAPIView):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
-    permission_classes = [IsAdmin]
+    permission_classes = [IsSalesAssociate]
 
 
 class InventoryListCreateView(generics.ListCreateAPIView):

@@ -1,22 +1,25 @@
 from django.db import models, transaction
 from base.models import BaseModel
-from account.models import User
+from account.models import CustomUser
 from product.models import Inventory
 
+
 class OrderStatusChoices(models.TextChoices):
-    PENDING = "pending", "Pending"
-    CONFIRMED = "confirmed", "Confirmed"
-    CANCELLED = "cancelled", "Cancelled"
+    PENDING = "PENDING", "Pending"
+    CONFIRMED = "CONFIRMED", "Confirmed"
+    CANCELLED = "CANCELLED", "Cancelled"
 
 
 class PaymentMethodChoices(models.TextChoices):
-    CASH = "cash", "Cash"
-    CARD = "card", "Card"
-    ONLINE = "online", "Online Payment"
+    CASH = "CASH", "Cash"
+    CARD = "CARD", "Card"
+    ONLINE = "ONLINE", "Online Payment"
 
 
 class Cart(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="carts")
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="carts"
+    )
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -34,8 +37,10 @@ class CartItem(BaseModel):
     )
 
     def save(self, *args, **kwargs):
-        if not self.price_per_item:
+        if not self.price_per_item and self.inventory:
             self.price_per_item = self.inventory.price
+        elif not self.inventory:
+            raise ValueError("Inventory must be set before saving a CartItem.")
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -43,7 +48,9 @@ class CartItem(BaseModel):
 
 
 class Order(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="orders"
+    )
     status = models.CharField(
         max_length=20,
         choices=OrderStatusChoices.choices,
@@ -56,179 +63,81 @@ class Order(BaseModel):
     )
 
     def calculate_total_price(self):
-        cart = self.user.carts
+        cart = getattr(self.user, "carts", None)
+        if not cart:
+            self.total_price = 0
+            return
 
         cart_items = cart.cart_items.all()
-     
         self.total_price = sum(
-            cart_item.price_per_item * cart_item.quantity for cart_item in cart_items
+            item.price_per_item * item.quantity for item in cart_items
         )
         self.save()
 
-
     def confirm_order(self):
-        if self.status == OrderStatusChoices.PENDING:
-            if not self.is_paid:
+        # if self.status != OrderStatusChoices.PENDING:
+        #     raise ValueError("Only pending orders can be confirmed.")
+
+        if not self.is_paid:
+            raise ValueError("Order cannot be confirmed until payment is completed.")
+
+        if not self.payment_method:
+            raise ValueError(
+                "Payment method must be selected before confirming the order."
+            )
+
+        with transaction.atomic():
+            cart = self.user.carts
+
+            if not cart:
+                raise ValueError("Cart does not exist.")
+
+            cart_items = cart.cart_items.all()
+            if not cart_items:
                 raise ValueError(
-                    "Order cannot be confirmed until payment is completed."
-                )
-            if not self.payment_method:
-                raise ValueError(
-                    "Payment method must be selected before confirming the order."
+                    "Cart is empty. Cannot confirm an order with no items."
                 )
 
-            with transaction.atomic():
-                cart = self.user.carts
-
-                cart_items = cart.cart_items.all()
-
-                if not cart_items:
+            for cart_item in cart_items:
+                if cart_item.inventory.stock < cart_item.quantity:
                     raise ValueError(
-                        "Cart is empty. Cannot confirm an order with no items."
+                        f"Not enough stock for {cart_item.inventory.medicine.name}. Available: {cart_item.inventory.stock}"
                     )
+                cart_item.inventory.stock -= cart_item.quantity
+                cart_item.inventory.save()
 
-                for cart_item in cart_items:
-                    OrderDetail.objects.create(
-                        order=self,
-                        cart_item=cart_item,
-                        quantity=cart_item.quantity,
-                        price=cart_item.price_per_item,
-                    )
+                OrderDetail.objects.create(
+                    order=self,
+                    inventory=cart_item.inventory,
+                    quantity=cart_item.quantity,
+                    price=cart_item.price_per_item,
+                )
 
-                self.calculate_total_price()
-                
-                self.status = OrderStatusChoices.CONFIRMED
-                self.save()
+            self.calculate_total_price()
 
+            self.status = OrderStatusChoices.CONFIRMED
+            self.save()
+
+            cart.cart_items.all().delete()
 
     def __str__(self):
         return f"Order {self.uid} by {self.user.email}"
-
 
 
 class OrderDetail(BaseModel):
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name="order_details"
     )
-    cart_item = models.ForeignKey(
-        CartItem, on_delete=models.CASCADE, related_name="order_details"
+    inventory = models.ForeignKey(
+        Inventory, on_delete=models.CASCADE, related_name="order_details"
     )
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.price = self.cart_item.price_per_item
-            self.quantity = self.cart_item.quantity
+            self.price = self.inventory.price
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"OrderDetail {self.pk} for Order {self.order.uid}"
-
-
-
-
- # def calculate_total_price(self):
-    #     try:
-    #         cart = self.user.carts
-    #         cart_items = cart.cart_items.all()
-
-    #         self.total_price = sum(
-    #             cart_item.price_per_item * cart_item.quantity for cart_item in cart_items
-    #         )
-    #         self.save()
-    #     except ObjectDoesNotExist:
-    #         raise ValueError("User does not have an active cart.")
-
-
-    # def calculate_total_price(self):
-    #     cart = self.user.carts
-    #     # if not cart.is_active:
-    #     #     raise ValueError("User does not have an active cart.")
-
-    #     cart_items = cart.cart_items.all()
-    #     # if not cart_items:
-    #     #     raise ValueError("Cart is empty. Cannot calculate total price for an empty cart.")
-
-    #     self.total_price = sum(
-    #         cart_item.price_per_item * cart_item.quantity for cart_item in cart_items
-    #     )
-    #     self.save()
-        
-    # def calculate_total_price(self):
-    #     order_details = self.order_details.all()
-    #     # if not order_details:
-    #     #     raise ValueError("Order details are empty. Cannot calculate total price.")
-
-    #     self.total_price = sum(
-    #         order_detail.price * order_detail.quantity for order_detail in order_details
-    #     )
-    #     self.save()
-
-
-    # def confirm_order(self):
-    #     if self.status == OrderStatusChoices.PENDING:
-    #         if not self.is_paid:
-    #             raise ValueError(
-    #                 "Order cannot be confirmed until payment is completed."
-    #             )
-    #         if not self.payment_method:
-    #             raise ValueError(
-    #                 "Payment method must be selected before confirming the order."
-    #             )
-
-    #         with transaction.atomic():
-    #             cart = self.user.carts
-    #             # if not cart or not cart.is_active:
-    #             #     raise ValueError("User does not have an active cart.")
-
-    #             cart_items = cart.cart_items.all()
-                
-    #             # if not cart_items:
-    #             #     raise ValueError(
-    #             #         "Cart is empty. Cannot confirm an order with no items."
-    #             #     )
-
-    #             for cart_item in cart_items:
-    #                 OrderDetail.objects.create(
-    #                     order=self,
-    #                     cart_item=cart_item,
-    #                     quantity=cart_item.quantity,
-    #                     price=cart_item.price_per_item,
-    #                 )
-
-    #             # cart_items.delete()
-    #             # cart.cart_items.all().delete()
-    #             self.calculate_total_price()
-    #             self.status = OrderStatusChoices.CONFIRMED
-    #             self.save()
-
-    # def confirm_order(self):
-    #     if self.status == OrderStatusChoices.PENDING:
-    #         if not self.is_paid:
-    #             raise ValueError("Order cannot be confirmed until payment is completed.")
-    #         if not self.payment_method:
-    #             raise ValueError("Payment method must be selected before confirming the order.")
-
-    #         with transaction.atomic():
-    #             cart = self.user.carts
-    #             cart_items = cart.cart_items.all()
-
-    #             if not cart_items:
-    #                 raise ValueError("Cart is empty. Cannot confirm an order with no items.")
-
-    #             total_price = sum(
-    #                 cart_item.price_per_item * cart_item.quantity for cart_item in cart_items
-    #             )
-
-    #             for cart_item in cart_items:
-    #                 OrderDetail.objects.create(
-    #                     order=self,
-    #                     cart_item=cart_item,
-    #                     quantity=cart_item.quantity,
-    #                     price=cart_item.price_per_item,
-    #                 )
-
-    #             self.total_price = total_price
-    #             self.status = OrderStatusChoices.CONFIRMED
-    #             self.save()
