@@ -10,6 +10,29 @@
 			"name": "Auth",
 			"item": [
 				{
+					"name": "Home",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Register",
 					"request": {
 						"auth": {
@@ -19,7 +42,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"dipto@gmail.com\",\n    \"password\": \"diptorepliq\",\n    \"first_name\": \"Mr\",\n    \"last_name\": \"Dipto\",\n    \"gender\": \"male\",\n    \"phone\": \"01700022244\",\n    \"address\": \"Rajshahi\",\n    \"role\": \"customer\"\n}",
+							"raw": "{\n    \"email\": \"sh@gmail.com\",\n    \"password\": \"shrepliq\",\n    \"first_name\": \"Sadik\",\n    \"last_name\": \"Hasan\",\n    \"gender\": \"MALE\",\n    \"phone\": \"+8801716110871\",\n    \"address\": \"Rajshahi\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -45,7 +68,7 @@
 					"response": []
 				},
 				{
-					"name": "Login-Admin",
+					"name": "Login-SuperUser",
 					"request": {
 						"auth": {
 							"type": "noauth"
@@ -86,73 +109,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"dk@gmail.com\",\n    \"password\": \"dkrepliq\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/login/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"login",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login-Sales Associate",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"nasim@gmail.com\",\n    \"password\": \"nasimrepliq\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/login/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"login",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Login-Customer",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"dipto@gmail.com\",\n    \"password\": \"diptorepliq\"\n}",
+							"raw": "{\n    \"email\": \"orko@gmail.com\",\n    \"password\": \"orkorepliq\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -178,12 +135,21 @@
 					"response": []
 				},
 				{
-					"name": "Home",
+					"name": "Login-Sales Associate",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"nasim@gmail.com\",\n    \"password\": \"nasimrepliq\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/",
+							"raw": "http://127.0.0.1:8000/api/login",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -194,7 +160,71 @@
 							"port": "8000",
 							"path": [
 								"api",
-								""
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login-Customer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"rh@gmail.com\",\n    \"password\": \"rhrepliq\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login-OrgAdmin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"dk@gmail.com\",\n    \"password\": \"dkrepliq\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"login"
 							]
 						}
 					},
@@ -205,6 +235,39 @@
 		{
 			"name": "Account",
 			"item": [
+				{
+					"name": "profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/profile",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
 				{
 					"name": "user",
 					"protocolProfileBehavior": {
@@ -266,7 +329,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/user/0964e479-f8e8-4bf8-8741-547447106412",
+							"raw": "http://127.0.0.1:8000/api/user/e2ba6a53-127e-423e-9700-2b67fa4cc37c",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -278,14 +341,14 @@
 							"path": [
 								"api",
 								"user",
-								"0964e479-f8e8-4bf8-8741-547447106412"
+								"e2ba6a53-127e-423e-9700-2b67fa4cc37c"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "users/uid/update",
+					"name": "users/uid",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -301,7 +364,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"orko@gmail.com\",\n    \"first_name\": \"Orko\",\n    \"last_name\": \"Ullah\",\n    \"gender\": \"male\",\n    \"phone\": \"01711123333\",\n    \"address\": \"Shewrapara\",\n    \"role\": \"customer\",\n    \"status\": \"active\",\n    \"created_at\": \"2025-02-07T09:26:27.111597Z\",\n    \"updated_at\": \"2025-02-07T09:55:38.217008Z\"\n}",
+							"raw": "{\n    \"email\": \"ss@gmail.com\",\n    \"first_name\": \"Shaheen\",\n    \"last_name\": \"Saifulla\",\n    \"gender\": \"MALE\",\n    \"phone\": \"01816412357\",\n    \"address\": \"Rajshahi\",\n    \"status\": \"ACTIVE\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -309,7 +372,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/users/5b152187-283d-4a0a-80f8-5f86bbb8e786/update",
+							"raw": "http://127.0.0.1:8000/api/users/f01a03dd-718b-4041-93ea-607dd5d128fb",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -321,15 +384,14 @@
 							"path": [
 								"api",
 								"users",
-								"5b152187-283d-4a0a-80f8-5f86bbb8e786",
-								"update"
+								"f01a03dd-718b-4041-93ea-607dd5d128fb"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "user/uid/delete",
+					"name": "user/uid",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -344,7 +406,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/user/5b152187-283d-4a0a-80f8-5f86bbb8e786/delete",
+							"raw": "http://127.0.0.1:8000/api/user/5b152187-283d-4a0a-80f8-5f86bbb8e786",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -356,8 +418,7 @@
 							"path": [
 								"api",
 								"user",
-								"5b152187-283d-4a0a-80f8-5f86bbb8e786",
-								"delete"
+								"5b152187-283d-4a0a-80f8-5f86bbb8e786"
 							]
 						}
 					},
@@ -376,8 +437,17 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"name\": \"Ma Pharmacy\",\n        \"trade_licence\": \"10117824721mp\",\n        \"phone\": \"+8801716143121\",\n        \"email\": \"mp@gmail.com\",\n        \"address\": \"Rajshahi\",\n        \"details\": \"Largets pharmacyasdasd asdas\",\n        \"status\": \"ACTIVE\"\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/organizations",
 							"protocol": "http",
@@ -412,7 +482,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/organizations/ef1776f3-db8f-400c-899d-91a82cdcb33a",
+							"raw": "http://127.0.0.1:8000/api/organizations/5ab2db27-f372-4d7d-ad84-402209ed30f1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -424,14 +494,14 @@
 							"path": [
 								"api",
 								"organizations",
-								"ef1776f3-db8f-400c-899d-91a82cdcb33a"
+								"5ab2db27-f372-4d7d-ad84-402209ed30f1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "organizations/uid/update",
+					"name": "organizations/uid",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -447,7 +517,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": 2,\n    \"name\": \"Moon Lite\",\n    \"trade_licence\": \"10454541010mlml\",\n    \"phone\": \"01711122222\",\n    \"email\": \"ml@gmail.com\",\n    \"address\": \"Rajshahi\",\n    \"details\": \"n/a\",\n    \"status\": \"active\"\n}",
+							"raw": "{\n    \"name\": \"Moon Light\",\n    \"trade_licence\": \"101987123tml\",\n    \"phonne\": \"01716143040\",\n    \"email\": \"ml@gmail.com\",\n    \"address\": \"Rajshahi\",\n    \"details\": \"Largets pharmacy of Raj\",\n    \"status\": \"ACTIVE\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -455,7 +525,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/organizations/27992c51-fc33-4f3e-a1a1-5bf9fe2fbbf1/update",
+							"raw": "http://127.0.0.1:8000/api/organizations/5ab2db27-f372-4d7d-ad84-402209ed30f1",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -467,15 +537,14 @@
 							"path": [
 								"api",
 								"organizations",
-								"27992c51-fc33-4f3e-a1a1-5bf9fe2fbbf1",
-								"update"
+								"5ab2db27-f372-4d7d-ad84-402209ed30f1"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "organizations/uid/delete",
+					"name": "organizations/uid",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -490,7 +559,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/organizations/ef1776f3-db8f-400c-899d-91a82cdcb33a/delete",
+							"raw": "http://127.0.0.1:8000/api/organizations/ef1776f3-db8f-400c-899d-91a82cdcb33a",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -502,8 +571,7 @@
 							"path": [
 								"api",
 								"organizations",
-								"ef1776f3-db8f-400c-899d-91a82cdcb33a",
-								"delete"
+								"ef1776f3-db8f-400c-899d-91a82cdcb33a"
 							]
 						}
 					},
@@ -529,7 +597,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "    {\n        \"id\": 3,\n        \"uid\": \"4da65229-a581-44b2-89ca-0db4efeababc\",\n        \"user\": {\n            \"id\": 7,\n            \"email\": \"dk@gmail.com\",\n            \"fullname\": \"Dipu Kanu\"\n        },\n        \"organization\": {\n            \"id\": 1,\n            \"name\": \"Laaz Pharma\"\n        },\n        \"role\": \"sales\",\n        \"status\": \"removed\",\n        \"salary\": \"10000.00\",\n    }",
+							"raw": "{\n    \"user_id\": 8,\n    \"organization_id\": 2,\n    \"role\": \"SALES\",\n    \"status\": \"ACTIVE\",\n    \"salary\": \"10000\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -567,7 +635,7 @@
 								}
 							]
 						},
-						"method": "PUT",
+						"method": "DELETE",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -579,7 +647,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/organization-users/4da65229-a581-44b2-89ca-0db4efeababc",
+							"raw": "http://127.0.0.1:8000/api/organization-users/961d176b-b916-476f-ada7-54a13bb163b4",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -591,7 +659,7 @@
 							"path": [
 								"api",
 								"organization-users",
-								"4da65229-a581-44b2-89ca-0db4efeababc"
+								"961d176b-b916-476f-ada7-54a13bb163b4"
 							]
 						}
 					},
@@ -647,7 +715,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n        \"name\": \"\",\n        \"description\": \"\"\n    }",
+							"raw": "{\n    \"name\": \"Tablet\",\n    \"description\": \"akjdhask qweqeqe asdsad auasjs a\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -674,9 +742,6 @@
 				},
 				{
 					"name": "medicines",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -688,11 +753,11 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"\",\n    \"generic_name\": \"\",\n    \"description\": \"\",\n    \"manufacturer\": \"\"\n}",
+							"raw": "{\n    \"name\": \"Napa\",\n    \"generic_name\": \"parcetamol\",\n    \"description\": \"Med for fever, headache\",\n    \"manufacturer\": \"Square\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -736,13 +801,44 @@
 						"method": "GET",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"medicine\": \"\",\n    \"category\": \"\",\n    \"stock\": ,\n    \"price\": \"\",\n    \"image\": \"\",\n    \"expiry_date\": \"2026-10-01\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "medicine_id",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "category_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "stock",
+									"value": "300",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "15",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/home/ghalib/Pictures/Screenshots/Docker-passphrase.png"
+								},
+								{
+									"key": "expiry_date",
+									"value": "2026-10-01",
+									"type": "text"
+								},
+								{
+									"key": "organization_id",
+									"value": "1",
+									"type": "text"
 								}
-							}
+							]
 						},
 						"url": {
 							"raw": "http://127.0.0.1:8000/api/inventory",
@@ -764,6 +860,9 @@
 				},
 				{
 					"name": "inventory/uid",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -777,8 +876,17 @@
 						},
 						"method": "GET",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"medicine_id\": 2,\n    \"category_id\": 2,\n    \"stock\": 200,\n    \"price\": \"15.00\",\n    \"expiry_date\": \"2026-10-01\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/inventory/1290ce84-85f5-4b4d-b872-6a5e4b386469",
+							"raw": "http://127.0.0.1:8000/api/inventory/18b18cd4-e8b5-4b31-8fdb-a3781a651dc4",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -790,7 +898,51 @@
 							"path": [
 								"api",
 								"inventory",
-								"1290ce84-85f5-4b4d-b872-6a5e4b386469"
+								"18b18cd4-e8b5-4b31-8fdb-a3781a651dc4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "inventory/uid/update-stock",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"increase\": \"200\"\n    // \"decrease\": \"100\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:8000/api/inventory/11886e17-1231-4c77-9937-4d80b7133a7c/update-stock",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"inventory",
+								"11886e17-1231-4c77-9937-4d80b7133a7c",
+								"update-stock"
 							]
 						}
 					},
@@ -829,6 +981,16 @@
 				{
 					"name": "cart",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{Token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -840,7 +1002,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \n    \"user\" : 9\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -878,10 +1040,10 @@
 								}
 							]
 						},
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/cart/59c613ec-ff2e-47a7-b685-7a06b3094502",
+							"raw": "http://127.0.0.1:8000/api/cart/bd2485df-6e59-43b8-9ad2-8761f1b82d0c",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -893,7 +1055,7 @@
 							"path": [
 								"api",
 								"cart",
-								"59c613ec-ff2e-47a7-b685-7a06b3094502"
+								"bd2485df-6e59-43b8-9ad2-8761f1b82d0c"
 							]
 						}
 					},
@@ -901,6 +1063,9 @@
 				},
 				{
 					"name": "cart-items",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -912,11 +1077,11 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"cart\": 6,\n    \"inventory\": 1,\n    \"quantity\": 10\n}",
+							"raw": "{\n    \"cart\": 2,\n    \"inventory\": 1,\n    \"quantity\": 10\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -958,7 +1123,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"status\": \"confirmed\",\n    \"is_paid\": true,\n    \"payment_method\": \"cash\"\n}",
+							"raw": "{\n    \"status\": \"CONFIRMED\",\n    \"is_paid\": true,\n    \"payment_method\": \"CASH\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -984,7 +1149,7 @@
 					"response": []
 				},
 				{
-					"name": "order-detail",
+					"name": "order-details",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -1011,7 +1176,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/order/85ce8e91-54e3-4797-9931-3f7e3adc1bd5",
+							"raw": "http://127.0.0.1:8000/api/order-details",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -1022,8 +1187,7 @@
 							"port": "8000",
 							"path": [
 								"api",
-								"order",
-								"85ce8e91-54e3-4797-9931-3f7e3adc1bd5"
+								"order-details"
 							]
 						}
 					},
@@ -1045,7 +1209,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://127.0.0.1:8000/api/order/238d8448-3e03-4d44-a71b-31525f0a63cf",
+							"raw": "http://127.0.0.1:8000/api/order/21028f4c-0c56-47da-ab58-ca44a755fc88",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -1057,7 +1221,7 @@
 							"path": [
 								"api",
 								"order",
-								"238d8448-3e03-4d44-a71b-31525f0a63cf"
+								"21028f4c-0c56-47da-ab58-ca44a755fc88"
 							]
 						}
 					},
@@ -1098,163 +1262,30 @@
 			]
 		},
 		{
-			"name": "Inventory_Management",
-			"item": [
-				{
-					"name": "stock-movements/",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/stock-movements/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"stock-movements",
-								""
-							]
-						}
-					},
-					"response": []
+			"name": "http://127.0.0.1:8000/Product_image/Docker-passphrase.png",
+			"request": {
+				"auth": {
+					"type": "noauth"
 				},
-				{
-					"name": "stock-movements/uid/",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/stock-movements/628973c3-690a-4c3b-952c-6f2f777967ff/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"stock-movements",
-								"628973c3-690a-4c3b-952c-6f2f777967ff",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "sales-records/",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/sales-records/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"sales-records",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "sales-records/uid/",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/sales-records/86329676-d108-45b4-81ae-06399c49ced6/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"sales-records",
-								"86329676-d108-45b4-81ae-06399c49ced6",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "monthly-sales/",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://127.0.0.1:8000/api/monthly-sales/",
-							"protocol": "http",
-							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
-							],
-							"port": "8000",
-							"path": [
-								"api",
-								"monthly-sales",
-								""
-							]
-						}
-					},
-					"response": []
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/Product_image/Docker-passphrase.png",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"Product_image",
+						"Docker-passphrase.png"
+					]
 				}
-			],
-			"auth": {
-				"type": "bearer",
-				"bearer": [
-					{
-						"key": "token",
-						"value": "{{Token}}",
-						"type": "string"
-					}
-				]
 			},
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"type": "text/javascript",
-						"packages": {},
-						"exec": [
-							""
-						]
-					}
-				},
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"packages": {},
-						"exec": [
-							""
-						]
-					}
-				}
-			]
+			"response": []
 		}
 	],
 	"event": [
