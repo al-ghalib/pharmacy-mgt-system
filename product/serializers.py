@@ -90,27 +90,6 @@ class InventorySerializer(serializers.ModelSerializer):
         return Inventory.objects.create(medicine=medicine, category=category, organization=organization, **validated_data)
 
 
-# class InventoryStockUpdateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Inventory
-#         fields = ["stock"]
-
-#     def validate_stock(self, value):
-#         if value < 0:
-#             raise serializers.ValidationError("Stock cannot be negative.")
-#         return value
-
-
-#     def update(self, instance, validated_data):
-#         user = self.context["request"].user
-
-#         if not OrganizationUser.objects.filter(user=user, organization=instance.organization, status=StatusChoices.ACTIVE).exists():
-#             raise serializers.ValidationError(
-#                 {"detail": "You do not have permission to update this inventory."}
-#             )
-
-#         return super().update(instance, validated_data)
-
 class InventoryStockUpdateSerializer(serializers.ModelSerializer):
     increase = serializers.IntegerField(required=False, min_value=1)
     decrease = serializers.IntegerField(required=False, min_value=1)

@@ -1,7 +1,8 @@
 from rest_framework import generics, status
 from account.permissions import IsSalesAssociate, IsOrganizationAdmin
 from .models import Cart, CartItem, Order, OrderDetail
-from account.models import RoleChoices, OrganizationUser
+# from account.models import RoleChoices, OrganizationUser
+from .models import OrderStatusChoices
 from .serializers import (
     CartSerializer,
     CartItemSerializer,
@@ -10,6 +11,10 @@ from .serializers import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+# from django.db import transaction
+from django.core.exceptions import ValidationError
+
+
 
 class CartListCreateView(generics.ListCreateAPIView):
     queryset = Cart.objects.all()
@@ -38,7 +43,6 @@ class CartItemListCreateView(generics.ListCreateAPIView):
     serializer_class = CartItemSerializer
     permission_classes = [IsAuthenticated]
 
-
     def get_queryset(self):
         user = self.request.user
         return CartItem.objects.filter(cart__user=user)
@@ -50,6 +54,7 @@ class CartItemListCreateView(generics.ListCreateAPIView):
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+        
 
 
 class OrderListCreateView(generics.ListCreateAPIView):
@@ -60,11 +65,25 @@ class OrderListCreateView(generics.ListCreateAPIView):
         return Order.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        order = serializer.save(user=self.request.user)
-        order.calculate_total_price()
+        try:
+            serializer.is_valid(raise_exception=True)
+            
+            order = serializer.save(user=self.request.user)
+            
+            order.calculate_total_price()
 
-        if order.is_paid and order.payment_method:
-            order.confirm_order()
+            if order.status == OrderStatusChoices.CONFIRMED:
+                order.confirm_order()
+
+            return Response(
+                {"message": "Order has been created successfully!", "order_id": order.id},
+                status=status.HTTP_201_CREATED
+            )
+        except ValidationError as e:
+            error_details = e.detail if hasattr(e, 'detail') else {"error": e.messages}
+            return Response({"error": error_details}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -82,17 +101,3 @@ class OrderDetailsListView(generics.ListAPIView):
     serializer_class = OrderDetailsSerializer
     permission_classes = [IsOrganizationAdmin | IsSalesAssociate]
 
-    # def get_queryset(self):
-    #     user = self.request.user
-
-    #     try:
-    #         organization_user = user.organization_memberships.first() 
-    #     except OrganizationUser.DoesNotExist:
-    #         return OrderDetail.objects.none()
-
-    #     if organization_user.role in [RoleChoices.SALES, RoleChoices.ADMIN]:
-    #         return OrderDetail.objects.filter(
-    #             order__user__organization_memberships__organization=organization_user.organization
-    #         )
-    #     else:
-    #         return OrderDetail.objects.none()

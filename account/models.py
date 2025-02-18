@@ -104,11 +104,6 @@ class OrganizationUser(BaseModel):
     def is_active_member(self):
         return self.status == StatusChoices.ACTIVE
     
-    
-    # def save(self, *args, **kwargs):
-    #     if self.salary and self.salary < 0:
-    #         raise ValueError("Salary cannot be negative.")
-    #     super().save(*args, **kwargs)
  
 
 

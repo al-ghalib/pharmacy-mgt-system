@@ -2,6 +2,7 @@ from django.db import models, transaction
 from base.models import BaseModel
 from account.models import CustomUser
 from product.models import Inventory
+from django.core.exceptions import ValidationError
 
 
 class OrderStatusChoices(models.TextChoices):
@@ -75,17 +76,13 @@ class Order(BaseModel):
         self.save()
 
     def confirm_order(self):
-        # if self.status != OrderStatusChoices.PENDING:
-        #     raise ValueError("Only pending orders can be confirmed.")
-
+        if self.status != OrderStatusChoices.CONFIRMED:
+            raise ValueError("Order is not processed or confirmed")
         if not self.is_paid:
-            raise ValueError("Order cannot be confirmed until payment is completed.")
-
+            raise ValidationError("Order cannot be confirmed until payment is completed.")
         if not self.payment_method:
-            raise ValueError(
-                "Payment method must be selected before confirming the order."
-            )
-
+            raise ValidationError("Payment method must be selected before confirming the order.")
+        
         with transaction.atomic():
             cart = self.user.carts
 
@@ -94,13 +91,6 @@ class Order(BaseModel):
             
             if not cart.cart_items.exists():
                 raise ValueError("Cart is empty. Cannot confirm an order.")
-
-
-            # cart_items = cart.cart_items.all()
-            # if not cart_items:
-            #     raise ValueError(
-            #         "Cart is empty. Cannot confirm an order with no items."
-            #     )
 
             for cart_item in cart.cart_items.all():
                 if cart_item.inventory.stock < cart_item.quantity:
@@ -126,6 +116,7 @@ class Order(BaseModel):
 
     def __str__(self):
         return f"Order {self.uid} by {self.user.email}"
+
 
 
 class OrderDetail(BaseModel):
