@@ -1,5 +1,6 @@
 from django.db import models
 from base.models import BaseModel
+from account.models import Organization
 
 
 class Category(BaseModel):
@@ -23,14 +24,15 @@ class Medicine(BaseModel):
 class Inventory(BaseModel):
     medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name="details")
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="details")
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name="inventories")
     stock = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="Product_image/", blank=True, null=True)
     expiry_date = models.DateField()
 
     class Meta:
-        unique_together = ('medicine', 'category')  
+        unique_together = ('medicine', 'category', 'organization')  
 
     def __str__(self):
-        return f"{self.medicine} - {self.stock} units available"
+        return f"{self.medicine} - {self.stock} units available at {self.organization.name}"
     

@@ -1,6 +1,7 @@
 from .models import CustomUser, Organization, OrganizationUser, StatusChoices
 from .serializers import (
     UserSerializer,
+    UserProfileSerializer,
     OrganizationSerializer,
     OrganizationUserSerializer,
     LoginSerializer,
@@ -11,11 +12,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.response import Response
 
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied
 
 
 #### Home Page ###
@@ -84,6 +85,13 @@ class LoginView(generics.GenericAPIView):
 
 #### User ###
 
+class UserProfileView(generics.RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user 
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
@@ -91,20 +99,11 @@ class UserListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsSuperUser]
 
 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+class UserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsSuperUser]
     lookup_field = "uid"
-
-    def perform_destroy(self, instance):
-        instance.status = StatusChoices.REMOVED
-        instance.save()
-
-
-class UserUpdateView(generics.UpdateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = [IsSuperUser]
 
     def get_object(self):
         uid = self.kwargs.get("uid")
@@ -112,50 +111,23 @@ class UserUpdateView(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        data = request.data.copy()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
 
-        if "email" in data:
-            new_email = data["email"]
-            if new_email != instance.email:
-                if (
-                    CustomUser.objects.filter(email=new_email)
-                    .exclude(uid=instance.uid)
-                    .exists()
-                ):
-                    return Response(
-                        {"email": ["A user with that email already exists."]},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-        serializer = self.get_serializer(instance, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(
-                {
-                    "message": "User updated successfully.",
-                    "user": serializer.data,
-                },
+                {"message": "User updated successfully.", "user": serializer.data},
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class UserDeleteView(generics.DestroyAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsSuperUser]
-    lookup_field = "uid"
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def perform_destroy(self, instance):
         instance.status = StatusChoices.REMOVED
         instance.save()
-
         return Response(
             {"message": "User has been successfully marked as removed."},
             status=status.HTTP_200_OK,
         )
-
 
 
 #### Organization ###
@@ -163,27 +135,31 @@ class UserDeleteView(generics.DestroyAPIView):
 class OrganizationListCreateView(generics.ListCreateAPIView):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        if not self.request.user.is_superuser:
+            raise PermissionDenied("Only superusers can create an organization.")
+        serializer.save()
+
+
+class OrganizationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
     permission_classes = [IsSuperUser]
-
-
-class OrganizationDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
-    permission_classes = [IsSuperUser | IsOrganizationAdmin]
     lookup_field = "uid"
 
-    def perform_destroy(self, instance):
-        instance.status = StatusChoices.REMOVED
-        instance.save()
-
-
-class OrganizationUpdateView(generics.UpdateAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
-    permission_classes = [IsSuperUser | IsOrganizationAdmin]
-    lookup_field = "uid"
+    def get_object(self):
+        uid = self.kwargs.get("uid")
+        return super().get_object()
 
     def update(self, request, *args, **kwargs):
+        if not self.request.user.is_superuser:
+            return Response(
+                {"detail": "You do not have permission to perform this action."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
 
@@ -198,61 +174,135 @@ class OrganizationUpdateView(generics.UpdateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class OrganizationDeleteView(generics.DestroyAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
-    permission_classes = [IsSuperUser]
-    lookup_field = "uid"
-
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def perform_destroy(self, instance):
+        if not self.request.user.is_superuser:
+            return Response(
+                {"detail": "You do not have permission to perform this action."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        
         instance.status = StatusChoices.REMOVED
         instance.save()
         return Response(
             {"message": f"Organization '{instance.name}' has been marked as removed."},
             status=status.HTTP_200_OK,
         )
-
-
+    
 
 #### Organization User ###
+
+# class OrganizationUserListCreateView(generics.ListCreateAPIView):
+#     serializer_class = OrganizationUserSerializer
+#     permission_classes = [IsOrganizationAdmin]
+
+#     def get_queryset(self):
+#         user = self.request.user
+
+#         if user.is_superuser:  
+#             return OrganizationUser.objects.all()  
+
+#         try:
+#             organization_user = OrganizationUser.objects.get(user=user)
+#         except OrganizationUser.DoesNotExist:
+#             return OrganizationUser.objects.none()  
+
+#         if organization_user.role == "ADMIN":  
+#             return OrganizationUser.objects.filter(
+#                 organization=organization_user.organization, 
+#                 role__in=["SALES", "STOCK_UPDATER"]  
+#             ).exclude(status=StatusChoices.REMOVED)
+
+#         return OrganizationUser.objects.none()
+
+
+#     def create(self, request, *args, **kwargs):
+#             user = request.user
+#             try:
+#                 organization_user = OrganizationUser.objects.get(user=user)
+#             except OrganizationUser.DoesNotExist:
+#                 return Response(
+#                     {"message": "You are not associated with any organization."},
+#                     status=status.HTTP_400_BAD_REQUEST
+#                 )
+
+#             organization_id = request.data.get("organization_id")
+
+#             if int(organization_id) != organization_user.organization.id:
+#                 return Response(
+#                     {"message": "You cannot create OrganizationUser for a different organization."},
+#                     status=status.HTTP_403_FORBIDDEN
+#                 )
+
+#             response = super().create(request, *args, **kwargs)
+#             return Response(
+#                 {"message": "OrganizationUser created successfully.", "data": response.data},
+#                 status=status.HTTP_201_CREATED
+#             )
 
 class OrganizationUserListCreateView(generics.ListCreateAPIView):
     serializer_class = OrganizationUserSerializer
     permission_classes = [IsOrganizationAdmin]
 
     def get_queryset(self):
-        return OrganizationUser.objects.exclude(status=StatusChoices.REMOVED)
+        user = self.request.user
 
-    def perform_create(self, serializer):
-        user = serializer.validated_data["user_id"]
-        organization = serializer.validated_data["organization_id"]
+        if user.is_superuser:
+            return OrganizationUser.objects.all()
 
-        if OrganizationUser.objects.filter(
-            user=user, organization=organization
-        ).exists():
-            raise ValidationError("This user is already a member of the organization.")
+        organization_user = OrganizationUser.objects.filter(user=user).first()
+        if not organization_user:
+            return OrganizationUser.objects.none()
 
-        serializer.save()
-        return Response(
-            {"message": "Organization User created successfully."},
-            status=status.HTTP_201_CREATED,
-        )
+        if organization_user.role == "ADMIN":
+            return OrganizationUser.objects.filter(
+                organization=organization_user.organization,
+                role__in=["SALES", "STOCK_UPDATER"]
+            ).exclude(status=StatusChoices.REMOVED)
+
+        return OrganizationUser.objects.none()
 
 
-class OrganizationUserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    def create(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.is_superuser:
+            return super().create(request, *args, **kwargs)
+
+        try:
+            organization_user = OrganizationUser.objects.get(user=user)
+        except OrganizationUser.DoesNotExist:
+            return Response(
+                {"message": "You are not associated with any organization."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        organization_id = request.data.get("organization_id")
+        if int(organization_id) != organization_user.organization.id:
+            return Response(
+                {"message": "You cannot create an OrganizationUser for a different organization."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        return super().create(request, *args, **kwargs)
+
+
+class OrganizationUserRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrganizationUserSerializer
     permission_classes = [IsOrganizationAdmin]
     lookup_field = "uid"
 
     def get_queryset(self):
-        return OrganizationUser.objects.exclude(status=StatusChoices.REMOVED)
+        return OrganizationUser.objects.all()  
 
-    def perform_destroy(self, instance):
-        instance.status = StatusChoices.REMOVED
-        instance.save()
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        if not request.user.is_superuser and not instance.organization_user.user == request.user:
+            raise PermissionDenied("You do not have permission to delete this user.")
+       
+        instance.delete()
+       
         return Response(
-            {"message": "Organization User has been marked as removed."},
-            status=status.HTTP_200_OK,
+            {"message": "Organization User has been permanently deleted."},
+            status=status.HTTP_204_NO_CONTENT  
         )

@@ -6,42 +6,15 @@ urlpatterns = [
     path("login", views.LoginView.as_view(), name="login"),
     path("", views.Home.as_view(), name="home"),
 
+    path('profile', views.UserProfileView.as_view(), name='user-profile'),
+
     path("user", views.UserListCreateView.as_view(), name="user-list-create"),
-    path("user/<uuid:uid>", views.UserDetailView.as_view(), name="user-detail"),
-    path(
-        "users/<uuid:uid>/update", views.UserUpdateView.as_view(), name="user-update"
-    ),
-    path("user/<uuid:uid>/delete", views.UserDeleteView.as_view(), name="user-delete"),
- 
-    path(
-        "organizations",
-        views.OrganizationListCreateView.as_view(),
-        name="organization-list-create",
-    ),
-    path(
-        "organizations/<uuid:uid>",
-        views.OrganizationDetailView.as_view(),
-        name="organization-detail",
-    ),
-    path(
-        "organizations/<uuid:uid>/update",
-        views.OrganizationUpdateView.as_view(),
-        name="organization-update",
-    ),
-    path(
-        "organizations/<uuid:uid>/delete",
-        views.OrganizationDeleteView.as_view(),
-        name="organization-delete",
-    ),
+    path("user/<uuid:uid>", views.UserRetrieveUpdateDestroyView.as_view(), name="user-detail"),
     
-    path(
-        "organization-users",
-        views.OrganizationUserListCreateView.as_view(),
-        name="organization-user-list-create",
-    ),
-    path(
-        "organization-users/<uuid:uid>",
-        views.OrganizationUserDetailView.as_view(),
-        name="organization-user-detail",
-    ),
+    path("organizations", views.OrganizationListCreateView.as_view(), name="organization-list-create"),
+    path("organizations/<uuid:uid>", views.OrganizationRetrieveUpdateDestroyView.as_view(), name="organization-detail"),
+
+
+    path("organization-users", views.OrganizationUserListCreateView.as_view(), name="organization-user-list-create"),
+    path("organization-users/<uuid:uid>", views.OrganizationUserRetrieveUpdateDestroyView.as_view(), name="organization-user-detail"),
 ]

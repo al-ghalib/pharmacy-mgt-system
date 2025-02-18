@@ -16,6 +16,6 @@ class MedicineAdmin(admin.ModelAdmin):
 
 @admin.register(Inventory)
 class InventoryAdmin(admin.ModelAdmin):
-    list_display = ["uid", "medicine", "category", "stock", "price", "expiry_date"]
+    list_display = ["uid", "organization", "medicine", "category", "stock", "price", "expiry_date"]
     list_filter = ["category", "expiry_date"]
     search_fields = ["medicine__name", "category__name"]

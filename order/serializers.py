@@ -1,11 +1,22 @@
 from rest_framework import serializers
 from .models import Cart, CartItem, Order, OrderDetail, CustomUser, Inventory
+from account.models import Organization
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ["id", "email"]
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = [
+            "id",
+            "name",
+        ]
+        read_only_fields = ["id", "name"]
 
 
 class CartSerializer(serializers.ModelSerializer):
@@ -49,6 +60,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             "stock": instance.inventory.stock,
         }
         return data
+    
 
     class Meta:
         model = CartItem
@@ -86,7 +98,27 @@ class OrderDetailsSerializer(serializers.ModelSerializer):
     order = serializers.PrimaryKeyRelatedField(read_only=True)
     cart_item = serializers.PrimaryKeyRelatedField(read_only=True)
 
+    user = UserSerializer(read_only=True)
+    organization = OrganizationSerializer(read_only=True)
+    
+    
     class Meta:
         model = OrderDetail
-        fields = ["id", "uid", "order", "cart_item", "quantity", "price"]
-        read_only_fields = ["id", "uid", "order", "cart_item", "quantity", "price"]
+
+        fields = [
+            "id", "uid", "order", "cart_item", "quantity", "price", 
+            "user", "organization"
+        ]
+        read_only_fields = [
+            "id", "uid", "order", "cart_item", "quantity", "price", 
+            "user", "organization"
+        ]
+
+
+
+    # def get_organization(self, obj):
+    #     # Accessing the organization via the user's organization membership
+    #     organization_user = obj.order.user.organization_memberships.first()
+    #     if organization_user:
+    #         return organization_user.organization.name  # Return the organization name, or you can return more details
+    #     return None

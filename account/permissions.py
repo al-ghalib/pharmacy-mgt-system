@@ -37,14 +37,9 @@ class IsStockUpdater(permissions.BasePermission):
         )
 
 
-class IsCustomer(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and (
-            request.user.is_superuser
-            or request.user.organization_memberships.filter(
-                role=RoleChoices.CUSTOMER
-            ).exists()
-        )
+# class IsAuthenticated(permissions.BasePermission):
+#     def has_permission(self, request, view):
+#         return request.user.is_authenticated and request.user.organization_memberships.filter(role=RoleChoices.CUSTOMER).exists()
 
 
 class IsOrganizationStaff(permissions.BasePermission):

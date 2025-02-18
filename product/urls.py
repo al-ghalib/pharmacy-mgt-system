@@ -4,6 +4,7 @@ from .views import (
     MedicineListCreateView,
     InventoryListCreateView,
     InventoryRetrieveUpdateDestroyView,
+    InventoryStockUpdateView,
 )
 
 urlpatterns = [
@@ -18,5 +19,10 @@ urlpatterns = [
         "inventory/<uuid:uid>",
         InventoryRetrieveUpdateDestroyView.as_view(),
         name="inventory-retrieve-update-destroy",
+    ),
+    path(
+        "inventory/<uuid:uid>/update-stock",
+        InventoryStockUpdateView.as_view(),
+        name="inventory-stock-update",
     ),
 ]

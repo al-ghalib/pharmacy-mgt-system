@@ -1,8 +1,10 @@
 from datetime import timedelta
 from pathlib import Path
-# import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_DIR=f"{BASE_DIR}/Product_image"
+MEDIA_ROOT = MEDIA_DIR
+MEDIA_URL = "/Product_image/"
 SECRET_KEY = "django-insecure-bk@rl%_yw=z(7ie(3tnp_##krum@m9k^_8^k(5hxnd=ap2+$k$"
 
 DEBUG = True
@@ -21,8 +23,6 @@ INSTALLED_APPS = [
     "account",
     "product",
     "order",
-    "inventory_management",
-    # 'sales',
 ]
 
 MIDDLEWARE = [

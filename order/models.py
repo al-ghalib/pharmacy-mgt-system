@@ -91,14 +91,18 @@ class Order(BaseModel):
 
             if not cart:
                 raise ValueError("Cart does not exist.")
+            
+            if not cart.cart_items.exists():
+                raise ValueError("Cart is empty. Cannot confirm an order.")
 
-            cart_items = cart.cart_items.all()
-            if not cart_items:
-                raise ValueError(
-                    "Cart is empty. Cannot confirm an order with no items."
-                )
 
-            for cart_item in cart_items:
+            # cart_items = cart.cart_items.all()
+            # if not cart_items:
+            #     raise ValueError(
+            #         "Cart is empty. Cannot confirm an order with no items."
+            #     )
+
+            for cart_item in cart.cart_items.all():
                 if cart_item.inventory.stock < cart_item.quantity:
                     raise ValueError(
                         f"Not enough stock for {cart_item.inventory.medicine.name}. Available: {cart_item.inventory.stock}"

@@ -8,7 +8,6 @@ class RoleChoices(models.TextChoices):
     ADMIN = "ADMIN", "Admin"
     SALES = "SALES", "Sales Associate"
     STOCK_UPDATER = "STOCK_UPDATER", "Stock Updater"
-    CUSTOMER = "CUSTOMER", "Customer"
 
 
 class GenderChoices(models.TextChoices):
@@ -84,8 +83,7 @@ class OrganizationUser(BaseModel):
     )
 
     role = models.CharField(
-        max_length=20, choices=RoleChoices.choices, default=RoleChoices.CUSTOMER
-    ) 
+        max_length=20, choices=RoleChoices.choices) 
 
     status = models.CharField(
         max_length=10, choices=StatusChoices.choices, default=StatusChoices.ACTIVE
@@ -107,10 +105,10 @@ class OrganizationUser(BaseModel):
         return self.status == StatusChoices.ACTIVE
     
     
-    def save(self, *args, **kwargs):
-        if self.salary and self.salary < 0:
-            raise ValueError("Salary cannot be negative.")
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if self.salary and self.salary < 0:
+    #         raise ValueError("Salary cannot be negative.")
+    #     super().save(*args, **kwargs)
  
 
 
