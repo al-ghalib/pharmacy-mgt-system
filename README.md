@@ -1,7 +1,7 @@
-# Pharmacy Management System
+# B2C Pharmacy Management System
 
 ## Overview
-This is a Pharmacy Management System built using Django. It provides a comprehensive solution for managing pharmacy inventory, sales, and customer records efficiently. The system allows pharmacists to keep track of stock, process sales, and generate invoices seamlessly.
+This is a Pharmacy Management System built using the Django Rest Framework, following the best practices. It provides a comprehensive solution for managing pharmacy inventory, sales, and customer records efficiently. The system allows pharmacists to keep track of stock, process sales, and update inventories.
 
 ## Features
 - **User Authentication**: Secure login and user roles for admins and staff.
@@ -9,7 +9,6 @@ This is a Pharmacy Management System built using Django. It provides a comprehen
 - **Sales & Billing**: Process customer purchases and generate invoices.
 - **Order Management**: Manage supplier orders and restock inventory.
 - **Customer Management**: Maintain customer records for returning customers.
-- **Reports & Analytics**: Generate reports on sales and stock levels.
 
 ## Installation
 1. Clone the repository:
@@ -50,7 +49,7 @@ This is a Pharmacy Management System built using Django. It provides a comprehen
 This project requires the following:
 - Python
 - Django
-- Django Rest Framework (if applicable)
+- Django Rest Framework 
 - SQLite (default) or PostgreSQL (recommended for production)
 
 ## Contributing
